@@ -59,7 +59,7 @@ function ejecutarFuncion (text) {
     palabras.forEach(palabra => {
         switch (palabra.toLowerCase()) {
             case "navegador":
-                dialogue = "Abriendo navegador.";
+                dialogue = "En fa te lo hago. Abriendo navegador.";
 
                 textArea.value = dialogue;
                 leerTexto(dialogue);
@@ -79,7 +79,7 @@ function ejecutarFuncion (text) {
 
                 window.open('http://www.'+resultado);
 
-                dialogue = "Abriendo la página "+resultado;
+                dialogue = "En fa te lo hago. Abriendo la página "+resultado;
 
                 textArea.value = dialogue;
                 leerTexto(dialogue);

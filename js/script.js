@@ -4,15 +4,27 @@ const textArea = document.getElementById('textArea');
 
 const recognition = new webkitSpeechRecognition();
 
+let dialogue = "";
+
 recognition.continuous = true;
 recognition.lang = 'es-ES';
 recognition.interimResult = false;
+
+function iniciar(){ 
+    dialogue = "Hola, me presento, soy Alondra. ¿En qué puedo ayudarte hoy?."
+    textArea.value = dialogue;
+    leerTexto(dialogue);
+} 
 
 btnStart.addEventListener('click', () => {
     recognition.start();
 });
 
 btnStop.addEventListener('click', () => {
+    dialogue = "Muy bien, ya no podré escucharte.";
+
+    textArea.value = dialogue;
+    leerTexto(dialogue);
     recognition.abort();
 });
 
@@ -29,8 +41,8 @@ recognition.onerror = (event) => {
 function leerTexto(text) {
     const speech = new SpeechSynthesisUtterance(text);
     speech.volume = 1;
-    speech.rate = 1.3;
-    speech.pitch = 0.4;
+    speech.rate = 1;
+    speech.pitch = 1.5;
     speech.lang = 'es-ES'
 
     window.speechSynthesis.speak(speech);
@@ -47,9 +59,10 @@ function ejecutarFuncion (text) {
     palabras.forEach(palabra => {
         switch (palabra.toLowerCase()) {
             case "navegador":
-                textArea.value = "Abriendo navegador";
+                dialogue = "Abriendo navegador.";
 
-                leerTexto("Abriendo navegador");
+                textArea.value = dialogue;
+                leerTexto(dialogue);
 
                 palabraEncontrada = true;
                 break;
@@ -66,8 +79,18 @@ function ejecutarFuncion (text) {
 
                 window.open('http://www.'+resultado);
 
-                textArea.value = "Abriendo la página "+resultado;
-                leerTexto("Abriendo la página "+resultado);
+                dialogue = "Abriendo la página "+resultado;
+
+                textArea.value = dialogue;
+                leerTexto(dialogue);
+
+                palabraEncontrada = true;
+                break;
+            case "hola":
+                dialogue = "Hola, un gusto saludarte.";
+
+                textArea.value = dialogue;
+                leerTexto(dialogue);
 
                 palabraEncontrada = true;
                 break;
@@ -80,7 +103,10 @@ function ejecutarFuncion (text) {
     // Si no se encontró ninguna palabra coincidente
     if (!palabraEncontrada) {
         console.log("No se encontraron palabras específicas en el texto.");
-        textArea.value = "No te entendí pendejo";
-        leerTexto("No te entendí pendejo");
+
+        dialogue = "Lo siento, pero la instrucción "+text+" no está en mi programación.";
+
+        textArea.value = dialogue;
+        leerTexto(dialogue);
     }
 }

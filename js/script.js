@@ -139,9 +139,12 @@ async function ejecutarFuncion (text) {
     
     // Inicializar una variable para indicar si se encontró alguna palabra
     let palabraEncontrada = false;
+
+    var index = -1;
     
     // Utilizar un switch para verificar cada palabra
     for (const palabra of palabras) {
+        index = index+1;
         switch (palabra.toLowerCase()) {
             
             case "navegador":
@@ -205,19 +208,21 @@ async function ejecutarFuncion (text) {
                 }
                 break;
             case "buenos":
-                if (index < palabras.length - 1 && palabras[index + 1] === "dias.") {
+                if (index < palabras.length - 1 && palabras[index + 1] === "días") {
                     respuesta = "¡Buenos dias!, ¿qué puedo hacer hoy por ti?";
                     palabraEncontrada = true;
                 }
                 break;
             case "buenas":
-                if (index < palabras.length - 1 && palabras[index + 1] === "tardes.") {
+                console.log(index);
+                console.log(palabras[index+1]);
+                if (index < palabras.length - 1 && palabras[index + 1] === "tardes") {
                     respuesta = "¡Buenas tardes!, un mundo de informacion nos espera, ¿en que puedo ayudarte?";
                     palabraEncontrada = true;
                 }
                 break;
             case "buenas":
-                if (index < palabras.length - 1 && palabras[index + 1] === "noches.") {
+                if (index < palabras.length - 1 && palabras[index + 1] === "noches") {
                     respuesta = "¡Buenas noches!, mañana será un gran día siempre y cuando durmamos durante un buen rato, pero por lo pronto a indagar en la web, ¿que puedo hacer por ti?";
                     palabraEncontrada = true;
                 }

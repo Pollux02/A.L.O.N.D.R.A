@@ -1,10 +1,16 @@
-const btnStart = document.getElementById('btnStart');
-const btnStop = document.getElementById('btnStop');
+const btnStart = document.getElementById('miBoton');
+
 const textArea = document.getElementById('textArea');
 
 const recognition = new webkitSpeechRecognition();
 
-let dialogue = "";
+var elemento = document.getElementById("textBox");
+
+var textAnswerBox=document.getElementById("answer");
+
+var respuesta = "";
+
+let flag=true;
 
 recognition.continuous = true;
 recognition.lang = 'es-ES';
@@ -12,26 +18,50 @@ recognition.interimResult = false;
 
 function iniciar(){ 
     dialogue = "Hola, me presento, soy Alondra. ¿En qué puedo ayudarte hoy?."
-    textArea.value = dialogue;
     leerTexto(dialogue);
-} 
+    writeBox(2,dialogue);
+}
 
 btnStart.addEventListener('click', () => {
-    recognition.start();
+    if(flag == true){
+        recognition.start();
+        flag=false;
+        btnStart.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ff0000" d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/></svg>';
+
+    }
+    else{
+        recognition.abort();
+        flag=true
+        btnStart.innerHTML ='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/></svg>';
+        
+    }
+    
 });
 
-btnStop.addEventListener('click', () => {
-    dialogue = "Muy bien, ya no podré escucharte.";
-
-    textArea.value = dialogue;
-    leerTexto(dialogue);
+function abort(){
     recognition.abort();
-});
+    flag=true
+    btnStart.innerHTML ='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/></svg>';
+
+}
 
 recognition.onresult = (event) => {
     const texto = event.results[event.results.length - 1][0].transcript;
     ejecutarFuncion(texto);
-    console.log(texto);
+    writeBox(1,texto);
+    
+
+}
+function writeBox(option,texto){
+    texto+="<br>";
+    if(option==1){
+        elemento.innerHTML+=texto;
+    }
+    else{
+        textAnswerBox.innerHTML +=texto;
+    }
+    
+
 }
 
 recognition.onerror = (event) => {
@@ -39,6 +69,7 @@ recognition.onerror = (event) => {
 };
 
 function leerTexto(text) {
+    abort();
     const speech = new SpeechSynthesisUtterance(text);
     speech.volume = 1;
     speech.rate = 1;
@@ -46,9 +77,28 @@ function leerTexto(text) {
     speech.lang = 'es-ES'
 
     window.speechSynthesis.speak(speech);
+    
 }
 
-function ejecutarFuncion (text) {
+function obtenerClima(ciudad) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&units=metric&appid=108dd9a67c96f23039937fe6f3c91963`;
+
+    return new Promise((resolve, reject) => {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const temperatura = data.main.temp;
+                const descripcion = data.weather[0].description;
+                const respuesta = `La temperatura en ${ciudad} es de ${temperatura}°C. El clima es ${descripcion}.`;
+                resolve(respuesta);
+            })
+            .catch(error => {
+                reject("Ha ocurrido un error al consultar el clima en " + ciudad);
+            });
+    });
+}
+
+async function ejecutarFuncion (text) {
     // Separar el texto en palabras
     const palabras = text.split(/\s+/);
     
@@ -56,19 +106,23 @@ function ejecutarFuncion (text) {
     let palabraEncontrada = false;
     
     // Utilizar un switch para verificar cada palabra
-    palabras.forEach(palabra => {
+    for (const palabra of palabras) {
         switch (palabra.toLowerCase()) {
+            
             case "navegador":
-                dialogue = "En fa te lo hago. Abriendo navegador.";
+                textArea.value = "Abriendo navegador";
 
-                textArea.value = dialogue;
-                leerTexto(dialogue);
+                respuesta="Abriendo navegador"
+
+                //si quieres que escriba en el recuadro de alondra pon el numero 2
 
                 palabraEncontrada = true;
                 break;
             case "página":
+            case "abre":
+            
                  // Crear una expresión regular para encontrar la palabra junto con todo lo que la precede
-                const regex = new RegExp('.*?' + "página", 'i');
+                const regex = new RegExp('.*?' + palabra, 'i');
                 
                 // Reemplazar todo lo que coincide con la expresión regular por una cadena vacía
                 resultado = text.replace(regex, '');
@@ -77,36 +131,91 @@ function ejecutarFuncion (text) {
                 
                 console.log(resultado);
 
-                window.open('http://www.'+resultado);
+                window.open('http://www.'+resultado+".com");
 
-                dialogue = "En fa te lo hago. Abriendo la página "+resultado;
-
-                textArea.value = dialogue;
-                leerTexto(dialogue);
+                //textArea.value = "Abriendo la página "+resultado;
+                respuesta="Abriendo la página "+resultado;
+                
 
                 palabraEncontrada = true;
                 break;
+            case "busca":
+            case "buscar":
+            case "investiga":
+            case "investigar":
+            case "indagar":
+                // Crear una expresión regular para encontrar la palabra "buscar" junto con todo lo que la sigue
+                const regexBuscar = new RegExp('.*?' + palabra, 'i');
+                
+                // Reemplazar todo lo que coincide con la expresión regular por una cadena vacía
+                resultado = text.replace(regexBuscar, '');
+            
+                resultado = resultado.replace(/\s+/g, '');
+                
+                console.log(resultado);
+            
+                // Abrir una nueva ventana o pestaña con la búsqueda en Google
+                window.open('https://www.google.com/search?q=' + encodeURIComponent(resultado));
+                respuesta="buscando "+resultado +"en la web";
+                palabraEncontrada = true;
+                break;
+                
             case "hola":
-                dialogue = "Hola, un gusto saludarte.";
-
-                textArea.value = dialogue;
-                leerTexto(dialogue);
-
+            case "holi":
+                respuesta = "¡Hola!, en qué puedo ayudarte?";
                 palabraEncontrada = true;
                 break;
+            case "¿qué":
+                if (index < palabras.length - 1 && palabras[index + 1] === "tal?") {
+                    respuesta = "¡Qué tal!, ¿cómo puedo ayudarte hoy?";
+                    palabraEncontrada = true;
+                }
+                break;
+            case "buenos":
+                if (index < palabras.length - 1 && palabras[index + 1] === "dias.") {
+                    respuesta = "¡Buenos dias!, ¿qué puedo hacer hoy por ti?";
+                    palabraEncontrada = true;
+                }
+                break;
+            case "buenas":
+                if (index < palabras.length - 1 && palabras[index + 1] === "tardes.") {
+                    respuesta = "¡Buenas tardes!, un mundo de informacion nos espera, ¿en que puedo ayudarte?";
+                    palabraEncontrada = true;
+                }
+                break;
+            case "buenas":
+                if (index < palabras.length - 1 && palabras[index + 1] === "noches.") {
+                    respuesta = "¡Buenas noches!, mañana será un gran día siempre y cuando durmamos durante un buen rato, pero por lo pronto a indagar en la web, ¿que puedo hacer por ti?";
+                    palabraEncontrada = true;
+                }
+                break;
+            case "clima":
+                ciudad = text.replace(/.*\ben\b\s*/, '');
+                palabraEncontrada = true;
+                
+                try {
+                    // Obtener el clima de la ciudad
+                    const respuestaClima = await obtenerClima(ciudad);
+                    respuesta = respuestaClima;
+                } catch (error) {
+                    respuesta = "Ha ocurrido un error al consultar el clima en " + ciudad;
+                }
             default:
-                // Si no se encuentra ninguna palabra coincidente, no hacer nada
+
                 break;
         }
-    });
+    };
     
     // Si no se encontró ninguna palabra coincidente
-    if (!palabraEncontrada) {
+    if (palabraEncontrada==false) {
         console.log("No se encontraron palabras específicas en el texto.");
-
-        dialogue = "Lo siento, pero la instrucción "+text+" no está en mi programación.";
-
-        textArea.value = dialogue;
-        leerTexto(dialogue);
+        console.log(text);
+        //textArea.value = "No te entendí pendejo";
+        respuesta = "Lo siento, pero la instrucción "+text+" no está en mi programación."
+        leerTexto(respuesta);
+        writeBox(2,respuesta);
+    }else{
+        leerTexto(respuesta);
+        writeBox(2,respuesta);
     }
 }

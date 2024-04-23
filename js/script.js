@@ -149,13 +149,11 @@ async function ejecutarFuncion (text) {
                 
                 // Reemplazar todo lo que coincide con la expresión regular por una cadena vacía
                 resultado = text.replace(regexBuscar, '');
-            
-                resultado = resultado.replace(/\s+/g, '');
                 
                 console.log(resultado);
             
                 // Abrir una nueva ventana o pestaña con la búsqueda en Google
-                window.open('https://www.google.com/search?q=' + encodeURIComponent(resultado));
+                window.open('https://www.google.com/search?q=' + resultado);
                 respuesta="buscando "+resultado +"en la web";
                 palabraEncontrada = true;
                 break;
@@ -210,7 +208,6 @@ async function ejecutarFuncion (text) {
     if (palabraEncontrada==false) {
         console.log("No se encontraron palabras específicas en el texto.");
         console.log(text);
-        //textArea.value = "No te entendí pendejo";
         respuesta = "Lo siento, pero la instrucción "+text+" no está en mi programación."
         leerTexto(respuesta);
         writeBox(2,respuesta);

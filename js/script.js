@@ -80,6 +80,41 @@ function leerTexto(text) {
     
 }
 
+function traducirDescripcion(descripcion) {
+    switch(descripcion.toLowerCase()) {
+        case 'clear sky':
+            return 'cielo despejado';
+        case 'few clouds':
+            return 'algunas nubes';
+        case 'scattered clouds':
+            return 'nubosidad dispersa';
+        case 'broken clouds':
+            return 'nubes dispersas';
+        case 'overcast clouds':
+            return 'nublado';
+        case 'light rain':
+            return 'lluvia ligera';
+        case 'moderate rain':
+            return 'lluvia moderada';
+        case 'heavy intensity rain':
+            return 'lluvia intensa';
+        case 'snow':
+            return 'nevando';
+        case 'mist':
+            return 'neblina';
+        case 'thunderstorm':
+            return 'tormenta eléctrica';
+        case 'hail':
+            return 'granizo';
+        case 'drizzle':
+            return 'llovizna';
+        case 'wind':
+            return 'viento fuerte';
+        default:
+            return 'descripción no disponible';
+    }
+}
+
 function obtenerClima(ciudad) {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&units=metric&appid=108dd9a67c96f23039937fe6f3c91963`;
 
@@ -88,7 +123,7 @@ function obtenerClima(ciudad) {
             .then(response => response.json())
             .then(data => {
                 const temperatura = data.main.temp;
-                const descripcion = data.weather[0].description;
+                const descripcion = traducirDescripcion(data.weather[0].description);
                 const respuesta = `La temperatura en ${ciudad} es de ${temperatura}°C. El clima es ${descripcion}.`;
                 resolve(respuesta);
             })

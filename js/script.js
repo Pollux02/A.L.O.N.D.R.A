@@ -33,32 +33,23 @@ btnStart.addEventListener('click', () => {
         recognition.abort();
         flag=true
         btnStart.innerHTML ='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/></svg>';
-        
+        respuesta = "Muy bien, ya no podré escucharte.";
+        leerTexto(respuesta);
+        writeBox(2,respuesta);
     }
-    
 });
-
-function abort(){
-    recognition.abort();
-    flag=true
-    btnStart.innerHTML ='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z"/></svg>';
-
-}
 
 recognition.onresult = (event) => {
     const texto = event.results[event.results.length - 1][0].transcript;
-    ejecutarFuncion(texto);
-    writeBox(1,texto);
-    
-
+    procesarString(texto);
 }
 function writeBox(option,texto){
     texto+="<br>";
     if(option==1){
-        elemento.innerHTML+=texto;
+        elemento.innerHTML=texto;
     }
     else{
-        textAnswerBox.innerHTML +=texto;
+        textAnswerBox.innerHTML =texto;
     }
     
 
@@ -69,7 +60,6 @@ recognition.onerror = (event) => {
 };
 
 function leerTexto(text) {
-    abort();
     const speech = new SpeechSynthesisUtterance(text);
     speech.volume = 1;
     speech.rate = 1;
@@ -77,7 +67,6 @@ function leerTexto(text) {
     speech.lang = 'es-ES'
 
     window.speechSynthesis.speak(speech);
-    
 }
 
 function traducirDescripcion(descripcion) {
@@ -133,6 +122,17 @@ function obtenerClima(ciudad) {
     });
 }
 
+function procesarString(str) {
+    var partes = str.toLowerCase().split("alondra");
+
+    if (partes.length > 1) {
+        writeBox(1,"Alondra" + partes[1]);
+        ejecutarFuncion(partes[1])
+    } else {
+        console.log("No se escuchó alondra")
+    }
+}
+
 async function ejecutarFuncion (text) {
     // Separar el texto en palabras
     const palabras = text.split(/\s+/);
@@ -166,8 +166,6 @@ async function ejecutarFuncion (text) {
                 resultado = text.replace(regex, '');
 
                 resultado = resultado.replace(/\s+/g, '');
-                
-                console.log(resultado);
 
                 window.open('http://www.'+resultado+".com");
 
@@ -187,8 +185,6 @@ async function ejecutarFuncion (text) {
                 
                 // Reemplazar todo lo que coincide con la expresión regular por una cadena vacía
                 resultado = text.replace(regexBuscar, '');
-                
-                console.log(resultado);
             
                 // Abrir una nueva ventana o pestaña con la búsqueda en Google
                 window.open('https://www.google.com/search?q=' + resultado);
@@ -214,8 +210,6 @@ async function ejecutarFuncion (text) {
                 }
                 break;
             case "buenas":
-                console.log(index);
-                console.log(palabras[index+1]);
                 if (index < palabras.length - 1 && palabras[index + 1] === "tardes") {
                     respuesta = "¡Buenas tardes!, un mundo de informacion nos espera, ¿en que puedo ayudarte?";
                     palabraEncontrada = true;
@@ -226,6 +220,26 @@ async function ejecutarFuncion (text) {
                     respuesta = "¡Buenas noches!, mañana será un gran día siempre y cuando durmamos durante un buen rato, pero por lo pronto a indagar en la web, ¿que puedo hacer por ti?";
                     palabraEncontrada = true;
                 }
+                break;
+            case "encender":
+                try {
+                    // Realizar la solicitud HTTP para encender el LED
+                    await fetch('http://192.168.100.4/on', { mode: 'no-cors' });
+                    respuesta = "Encendiendo led";
+                } catch (error) {
+                    respuesta = "Ocurrió un error al encender el led.";
+                }
+                palabraEncontrada = true;
+                break;
+            case "apagar":
+                try {
+                    // Realizar la solicitud HTTP para apagar el LED
+                    await fetch('http://192.168.100.4/off', { mode: 'no-cors' });
+                    respuesta = "Apagando led";
+                } catch (error) {
+                    respuesta = "Ocurrió un error al apagar el led.";
+                }
+                palabraEncontrada = true;
                 break;
             case "clima":
                 ciudad = text.replace(/.*\ben\b\s*/, '');
@@ -246,8 +260,6 @@ async function ejecutarFuncion (text) {
     
     // Si no se encontró ninguna palabra coincidente
     if (palabraEncontrada==false) {
-        console.log("No se encontraron palabras específicas en el texto.");
-        console.log(text);
         respuesta = "Lo siento, pero la instrucción "+text+" no está en mi programación."
         leerTexto(respuesta);
         writeBox(2,respuesta);

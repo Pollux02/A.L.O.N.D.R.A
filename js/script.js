@@ -146,16 +146,14 @@ async function ejecutarFuncion (text) {
     for (const palabra of palabras) {
         index = index+1;
         switch (palabra.toLowerCase()) {
-            
-            case "navegador":
-                textArea.value = "Abriendo navegador";
-
-                respuesta="Abriendo navegador"
-
-                //si quieres que escriba en el recuadro de alondra pon el numero 2
+            case "saluda":
+            case "saludar":
+                //textArea.value = "Abriendo la página "+resultado;
+                respuesta="Claro. Hola clase de programación para internet, les habla Alondra, un Ayudante Lógico Orientado a la navegación y desempeño rápido";                
 
                 palabraEncontrada = true;
                 break;
+            
             case "página":
             case "abre":
             
